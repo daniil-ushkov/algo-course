@@ -3,6 +3,7 @@
 
 using namespace std;
 
+
 struct BIT_RSQ2;
 
 struct BIT {
@@ -133,7 +134,7 @@ struct heavy_light {
     return bit.get(pos[u], pos[u] + 1);
   }
 
-  void update(size_t u, size_t v, uint64_t val) {
+  void add(size_t u, size_t v, uint64_t val) {
     while (top[u] != top[v]) {
       if (t.d[top[u]] < t.d[top[v]]) swap(u, v);
       bit.add_range(pos[top[u]], pos[u] + 1, val);
@@ -206,7 +207,7 @@ void run() {
       size_t u, v;
       uint64_t d;
       cin >> u >> v >> d;
-      hld.update(u - 1, v - 1, d);
+      hld.add(u - 1, v - 1, d);
     }
     if (token == "?") {
       size_t u;

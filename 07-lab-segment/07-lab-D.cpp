@@ -4,37 +4,30 @@
 
 using namespace std;
 
-const int64_t INF = 2 * 1e18;
+const int32_t INF = 2 * 1e9;
 
-struct segment_tree {
-  explicit segment_tree(vector<int64_t > &vec)
+struct range_tree {
+  explicit range_tree(vector<int32_t> &vec)
       : data_(4 * vec.size()),
-        add_(4 * vec.size(), INF),
-        add_(4 * vec.size(), 0),
+        set_(4 * vec.size(), INF),
         size_(vec.size()) {
     build_(vec, ROOT_);
 //    PRINT_VEC(data_)
   }
 
-  int64_t get(size_t l, size_t r) {
+  int32_t get(size_t l, size_t r) {
     segment_ query(-1, l, r);
     return get_(ROOT_, query);
   }
 
-  void set(size_t l, size_t r, int64_t val) {
+  void update(size_t l, size_t r, int32_t val) {
     segment_ query(-1, l, r);
-    update_(ROOT_, query, val, 0);
-  }
-
-  void add(size_t l, size_t r, int64_t val) {
-    segment_ query(-1, l, r);
-    update_(ROOT_, query, INF, val);
+    update_(ROOT_, query, val);
   }
 
  private:
-  vector<int64_t > data_;
-  vector<int64_t > add_;
-  vector<int64_t > add_;
+  vector<int32_t> data_;
+  vector<int32_t> set_;
   size_t size_;
 
   struct segment_ {
@@ -73,7 +66,7 @@ struct segment_tree {
 
   segment_ ROOT_ = segment_(0, 0, size_);
 
-  void build_(vector<int64_t > &vec, segment_ node) {
+  void build_(vector<int32_t> &vec, segment_ node) {
     if (node.is_leaf()) {
       data_[node.index] = vec[node.l];
       return;
@@ -83,7 +76,7 @@ struct segment_tree {
     data_[node.index] = min(data_[2 * node.index + 1], data_[2 * node.index + 2]);
   }
 
-  int64_t get_(segment_ node, segment_ query) {
+  int32_t get_(segment_ node, segment_ query) {
     push_(node);
     if (segment_::not_cross(node, query)) {
       return INF;
@@ -94,53 +87,29 @@ struct segment_tree {
     return min(get_(node.left(), query), get_(node.right(), query));
   }
 
-  void update_(segment_ node, segment_ query, int64_t set_val, int64_t add_val) {
-    push_(node);
+  void update_(segment_ node, segment_ query, int32_t val) {
     if (segment_::not_cross(node, query)) {
       return;
     }
     if (query.contains(node)) {
-      if (set_val != INF) {
-        add_[node.index] = set_val;
-      }
-      if (add_val != 0) {
-        add_[node.index] = add_val;
-      }
+      set_[node.index] = val;
       return;
     }
-    update_(node.left(), query, set_val, add_val);
-    update_(node.right(), query, set_val, add_val);
+    update_(node.left(), query, val);
+    update_(node.right(), query, val);
     push_(node.left());
     push_(node.right());
     data_[node.index] = min(data_[node.left().index], data_[node.right().index]);
   }
 
   void push_(segment_ node) {
-    if (add_[node.index] != INF) {
-      data_[node.index] = add_[node.index];
+    if (set_[node.index] != INF) {
+      data_[node.index] = set_[node.index];
       if (!node.is_leaf()) {
-        add_[node.left().index] = add_[node.index];
-        add_[node.right().index] = add_[node.index];
-        add_[node.left().index] = 0;
-        add_[node.right().index] = 0;
+        set_[node.left().index] = set_[node.index];
+        set_[node.right().index] = set_[node.index];
       }
-      add_[node.index] = INF;
-    }
-    if (add_[node.index] != 0) {
-      data_[node.index] += add_[node.index];
-      if (!node.is_leaf()) {
-        if (add_[node.left().index] != INF) {
-          add_[node.left().index] += add_[node.index];
-        } else {
-          add_[node.left().index] += add_[node.index];
-        }
-        if (add_[node.right().index] != INF) {
-          add_[node.right().index] += add_[node.index];
-        } else {
-          add_[node.right().index] += add_[node.index];
-        }
-      }
-      add_[node.index] = 0;
+      set_[node.index] = INF;
     }
   }
 };
@@ -148,11 +117,11 @@ struct segment_tree {
 void run() {
   size_t n;
   cin >> n;
-  vector<int64_t > a(n);
+  vector<int32_t> a(n);
   for (size_t i = 0; i < n; ++i) {
     cin >> a[i];
   }
-  segment_tree t(a);
+  range_tree t(a);
   string token;
   while (cin >> token) {
     if (token == "min") {
@@ -161,16 +130,10 @@ void run() {
       cout << t.get(l - 1, r) << "\n";
     }
     if (token == "set") {
-      size_t l, r;
-      int64_t val;
-      cin >> l >> r >> val;
-      t.set(l - 1, r, val);
-    }
-    if (token == "update") {
-      size_t l, r;
-      int64_t val;
-      cin >> l >> r >> val;
-      t.add(l - 1, r, val);
+      size_t i;
+      int32_t val;
+      cin >> i >> val;
+      t.update(i - 1, i, val);
     }
   }
 }

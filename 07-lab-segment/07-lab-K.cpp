@@ -115,6 +115,5 @@ int main() {
       cout << st.min_range(in[compression[q.second]],
                            out[compression[q.first]] + 1).second + 1 << "\n";
   }
-
   return 0;
 }

@@ -10,8 +10,8 @@ using namespace std;
 
 #define OP(node1, node2) (node1.first > node2.first ? node1 : node2)
 
-struct segment_tree {
-  explicit segment_tree(vector<pair<size_t, int32_t> > &vec)
+struct range_tree {
+  explicit range_tree(vector<pair<size_t, int32_t> > &vec)
       : data_(4 * vec.size()),
         add_(4 * vec.size()),
         size_(vec.size()) {
@@ -146,7 +146,7 @@ void run() {
     vec.emplace_back(0, y);
     j++;
   }
-  segment_tree tree(vec);
+  range_tree tree(vec);
 
   // Scanline
   sort(xs.begin(), xs.end(),

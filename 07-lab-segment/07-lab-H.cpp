@@ -15,8 +15,8 @@ using namespace std;
 
 const size_t INF = SIZE_MAX;
 
-struct segment_tree {
-  explicit segment_tree(vector<bool> &vec)
+struct range_tree {
+  explicit range_tree(vector<bool> &vec)
       : data_(4 * vec.size()),
         size_(vec.size()) {
     build_(vec, ROOT_);
@@ -114,7 +114,7 @@ void run() {
   size_t n, m;
   cin >> n >> m;
   vector<bool> vec(n);
-  segment_tree t(vec);
+  range_tree t(vec);
   for (size_t i = 0; i < m; ++i) {
     string token;
     size_t val;

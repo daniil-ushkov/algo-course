@@ -1,37 +1,20 @@
-//Contains kludges
-
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         try (Scanner scnanner = new Scanner(System.in)) {
             BST bst = new BST();
+            scnanner.nextInt();
             while (scnanner.hasNext()) {
                 String command = scnanner.next();
-                if (command.equals("insert")) {
+                if (command.equals("1") || command.equals("+1")) {
                     bst.insert(scnanner.nextInt());
                 }
-                if (command.equals("delete")) {
+                if (command.equals("-1")) {
                     bst.delete(scnanner.nextInt());
                 }
-                if (command.equals("exists")) {
-                    System.out.println(bst.exists(scnanner.nextInt()));
-                }
-                if (command.equals("next")) {
-                    Node node = bst.next(scnanner.nextInt());
-                    if (node == null) {
-                        System.out.println("none");
-                    } else {
-                        System.out.println(node.value);
-                    }
-                }
-                if (command.equals("prev")) {
-                    Node node = bst.prev(scnanner.nextInt());
-                    if (node == null) {
-                        System.out.println("none");
-                    } else {
-                        System.out.println(node.value);
-                    }
+                if (command.equals("0")) {
+                    System.out.println(bst.root.kth(scnanner.nextInt() - 1));
                 }
             }
         }
@@ -105,6 +88,7 @@ class BST {
 class Node {
     int value;
     int height;
+    int size;
     Node parent;
     Node leftChild, rightChild;
     static Node lastDeleted;
@@ -112,6 +96,7 @@ class Node {
     public Node(int value) {
         this.value = value;
         this.height = 0;
+        this.size = 1;
         leftChild = null;
         rightChild = null;
         lastDeleted = null;
@@ -261,11 +246,12 @@ class Node {
         return this;
     }
 
-    public static void correctHeight(Node node) {
+    public static void correctHeightAndSize(Node node) {
         if (node == null) {
             return;
         }
         node.height = 1 + Math.max(getHeight(node.leftChild), getHeight(node.rightChild));
+        node.size = size(node.leftChild) + size(node.rightChild) + 1;
     }
 
     public static int getHeight(Node node) {
@@ -294,9 +280,9 @@ class Node {
             }
             this.setRightChild(parent);
             parent.setLeftChild(child);
-            correctHeight(parent);
-            correctHeight(this);
-            correctHeight(grandParent);
+            correctHeightAndSize(parent);
+            correctHeightAndSize(this);
+            correctHeightAndSize(grandParent);
         } else {
             Node grandParent = this.parent.parent;
             Node parent = this.parent;
@@ -312,16 +298,16 @@ class Node {
             }
             this.setLeftChild(parent);
             parent.setRightChild(child);
-            correctHeight(parent);
-            correctHeight(this);
-            correctHeight(grandParent);
+            correctHeightAndSize(parent);
+            correctHeightAndSize(this);
+            correctHeightAndSize(grandParent);
         }
 
 
     }
 
     public Node correct() {
-        correctHeight(this);
+        correctHeightAndSize(this);
         Node grandParent = this.parent;
         Node leftChild = this.leftChild;
         Node rightChild = this.rightChild;
@@ -355,5 +341,22 @@ class Node {
         } else {
             return root;
         }
+    }
+
+    public static int size(Node node) {
+        if (node == null) {
+            return 0;
+        }
+        return node.size;
+    }
+
+    public int kth(int k) {
+        if (size(this.rightChild) == k) {
+            return this.value;
+        }
+        if (size(this.rightChild) > k) {
+            return this.rightChild.kth(k);
+        }
+        return this.leftChild.kth(k - 1 - size(this.rightChild));
     }
 }

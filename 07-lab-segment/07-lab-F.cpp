@@ -45,10 +45,10 @@ ostream &operator<<(ostream &out, matrix m) {
   return out;
 }
 
-struct segment_tree {
-  explicit segment_tree(vector<matrix> &vec)
+struct range_tree {
+  explicit range_tree(vector<matrix> &vec)
       : data_(4 * vec.size()),
-        add_(4 * vec.size()),
+        set_(4 * vec.size()),
         size_(vec.size()) {
     build_(vec, ROOT_);
 //    PRINT_VEC(data_)
@@ -61,7 +61,7 @@ struct segment_tree {
 
  private:
   vector<matrix> data_;
-  vector<matrix> add_;
+  vector<matrix> set_;
   size_t size_;
 
   struct segment_ {
@@ -128,7 +128,7 @@ void run() {
   for (size_t i = 0; i < n; ++i) {
     cin >> a[i];
   }
-  segment_tree t(a);
+  range_tree t(a);
   for (size_t i = 0; i < m; ++i) {
     size_t l, r;
     cin >> l >> r;
